@@ -59,23 +59,6 @@ Response:
 }
 ```
 
-## Task 5: Deployment Components
-
-### Task 5.1: Model Deployment (REST API)
-- **FastAPI** (`api.py`) serves the trained model
-- **Endpoint**: `/v1/models/stock_model:predict`
-- See: `workflow.md` for production deployment
-
-### Task 5.2: Model as SaaS (Web Interface)
-- **Streamlit** (`app.py`) provides user-friendly dashboard
-- Features: historical data, prediction, visualization
-
-### Task 5.3: AI Engineering Workflow
-- **Apache Airflow** DAG (`stock_prediction_dag.py`)
-- **dbt** for data transformations
-- **Airbyte** for data ingestion
-- Full workflow documented in `workflow.md`
-
 ## Dependencies
 
 ```
