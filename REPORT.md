@@ -4,8 +4,10 @@
 
 ---
 
-**Student ID:** 220027  
-**Course:** Deep Learning for AI (DL4AI)  
+**Student ID:** 220027
+
+**Course:** Deep Learning for AI (DL4AI)
+
 **Submission Date:** May 2026
 
 ---
@@ -39,7 +41,7 @@ Stock price prediction is a challenging time-series forecasting problem. Traditi
 
 ### 2.3 Scope
 
-- **Data Sources:** Apple Inc. (AAPL) NASDAQ data, Vietnam Exchange (VNINDEX) data
+- **Data Sources:** Apple Inc. (AAPL) NASDAQ data, Vietnam Exchange (VNINDEX) data
 - **Features:** Open, High, Low, Close, Volume, Adjusted Close
 - **Target:** Next-day Open price prediction
 - **Model:** Conv1D neural network
@@ -50,16 +52,16 @@ Stock price prediction is a challenging time-series forecasting problem. Traditi
 
 ### 3.1 Datasets
 
-| Dataset | Source | Time Range | Records |
-|---------|--------|------------|---------|
+| **Dataset** | **Source** | **Time Range** | **Records** |
+| --- | --- | --- | --- |
 | AAPL.csv | Yahoo Finance | 1980-2023 | ~10,800 |
 | ACB-VNINDEX-History.csv | Vietnam Exchange | Recent | ~2,000 |
 | companies.csv | VN companies list | N/A | 100+ |
 
 ### 3.2 Features
 
-| Feature | Description |
-|---------|-------------|
+| **Feature** | **Description** |
+| --- | --- |
 | Date | Trading date |
 | Open | Opening price |
 | High | Highest price of the day |
@@ -104,8 +106,8 @@ model = tf.keras.Sequential([
 
 ### 4.2 Training Configuration
 
-| Parameter | Value |
-|-----------|-------|
+| **Parameter** | **Value** |
+| --- | --- |
 | Optimizer | Adam |
 | Learning Rate | 0.01 |
 | Loss Function | Mean Squared Error (MSE) |
@@ -124,37 +126,36 @@ model = tf.keras.Sequential([
 
 ### 5.1 Task 1: Data Analysis & Visualization
 
-#### Observations
+### Observations
 
 During the exploratory data analysis (EDA) of the AAPL stock data spanning from 1980 to 2023 (approximately 10,800 records), several key patterns emerged:
 
 1. **Long-term upward trend**: AAPL stock showed a significant overall growth trajectory, especially accelerating after 2010 when the company introduced the iPhone.
-
 2. **Volatility clustering**: Market volatility was not uniformly distributed. Notable high-volatility periods included:
-   - **2008 Financial Crisis**: Sharp price declines and increased variance
-   - **2020 COVID-19 Pandemic**: Rapid market drops followed by swift recovery
-   - **2012-2014**: Post-PC era transition period
-
+    - **2008 Financial Crisis**: Sharp price declines and increased variance
+    - **2020 COVID-19 Pandemic**: Rapid market drops followed by swift recovery
+    - **2012-2014**: Post-PC era transition period
 3. **Seasonal patterns**: Subtle yearly patterns were detected with slightly higher trading volumes during earnings seasons (January, April, July, October).
-
 4. **Volume-Price correlation**: Higher trading volumes often preceded significant price movements, suggesting volume as a valuable predictive feature.
 
-#### Vietnam Market Observations
+### Vietnam Market Observations
 
 The Vietnam Exchange data (ACB-VNINDEX) contained approximately 2,000 records with the following characteristics:
 
-| Feature | AAPL (Nasdaq) | ACB (Vietnam) |
-|---------|---------------|---------------|
+| **Feature** | **AAPL (Nasdaq)** | **ACB (Vietnam)** |
+| --- | --- | --- |
 | Date Range | 1980-2023 | 2006-present |
 | Records | ~10,800 | ~2,000 |
-| Features | 6 (incl. Adj. Close) | 5 (no Adj. Close) |
+| Features | 6 (incl. Adj. Close) | 5 (no Adj. Close) |
 | Currency | USD | VND |
 
 The Vietnam market exhibited higher volatility relative to its price level compared to mature US markets.
 
-![Figure 3: Vietnam Stock Prediction](report_figures/fig3_vietnam_prediction.png)
+![Figure 1: Vietnam Stock Prediction](Stock%20Price%20Prediction%20using%20Deep%20Learning/fig3_vietnam_prediction.png)
 
-#### Data Preprocessing Challenges
+Figure 1: Vietnam Stock Prediction
+
+### Data Preprocessing Challenges
 
 Several challenges were encountered during data preparation:
 
@@ -165,34 +166,34 @@ Several challenges were encountered during data preparation:
 df['Date'] = pd.to_datetime(df['Date'], format="%d-%m-%Y")  # Required explicit format
 ```
 
-2. **Missing values**: Some early records had missing volume data, addressed via forward-fill interpolation.
+1. **Missing values**: Some early records had missing volume data, addressed via forward-fill interpolation.
+2. **Feature availability**: Vietnam data lacked ‘Adjusted Close’ column, requiring feature set adjustment.
+3. **Window size selection**: Choosing 30 days as window size was a trade-off between:
+    - Capturing sufficient temporal patterns
+    - Maintaining computational efficiency
+    - Avoiding vanishing gradients in training
 
-3. **Feature availability**: Vietnam data lacked 'Adjusted Close' column, requiring feature set adjustment.
-
-4. **Window size selection**: Choosing 30 days as window size was a trade-off between:
-   - Capturing sufficient temporal patterns
-   - Maintaining computational efficiency
-   - Avoiding vanishing gradients in training
-
-#### Findings
+### Findings
 
 - The 6-feature model (Low, Open, Volume, High, Close, Adjusted Close) provided better prediction accuracy than single-feature models
 - Min-max normalization per window prevented data leakage between train/test splits
 - Temporal split (no shuffling) was essential to maintain time-series integrity
 
-![Figure 1: Data Overview](report_figures/fig1_prediction_vs_actual.png)
+![Figure 2: Data Overview](Stock%20Price%20Prediction%20using%20Deep%20Learning/fig1_prediction_vs_actual.png)
+
+Figure 2: Data Overview
 
 ---
 
 ### 5.2 Task 2: Model Training & Evaluation
 
-#### Model Architecture
+### Model Architecture
 
 The Conv1D model was designed specifically for time-series pattern recognition:
 
 ```python
 model = tf.keras.Sequential([
-    Conv1D(64, kernel_size=3, activation='relu', 
+    Conv1D(64, kernel_size=3, activation='relu',
            input_shape=(window_size, 6), padding='same'),
     MaxPooling1D(pool_size=2),
     Conv1D(128, kernel_size=3, activation='relu', padding='same'),
@@ -205,31 +206,29 @@ model = tf.keras.Sequential([
 ])
 ```
 
-#### Results
+### Results
 
-| Metric | Training | Validation | Test |
-|--------|----------|------------|------|
+| **Metric** | **Training** | **Validation** | **Test** |
+| --- | --- | --- | --- |
 | MSE | 0.0509 | 0.0389 | ~0.14-0.15 |
 | RMSE | ~0.22 | ~0.19 | ~0.38 |
 
-#### Why These Results
+### Why These Results
 
 1. **Validation lower than training**: The validation MSE (0.0389) being lower than training MSE (0.0509) suggests:
-   - The model generalizes well to unseen data
-   - No significant overfitting detected
-   - The 20% validation split captured representative patterns
-
+    - The model generalizes well to unseen data
+    - No significant overfitting detected
+    - The 20% validation split captured representative patterns
 2. **Test MSE higher than validation**: The test MSE (~0.14) being higher is attributable to:
-   - Distribution shift in later time periods
-   - Market conditions during test period may differ from validation
-   - Reduced dataset size (using last 1000 records for faster training)
-
+    - Distribution shift in later time periods
+    - Market conditions during test period may differ from validation
+    - Reduced dataset size (using last 1000 records for faster training)
 3. **Normalization effectiveness**: Per-window min-max normalization ensured:
-   - Each sample scaled independently (0-1 range)
-   - No data leakage between time periods
-   - Stable gradient flow during backpropagation
+    - Each sample scaled independently (0-1 range)
+    - No data leakage between time periods
+    - Stable gradient flow during backpropagation
 
-#### Convergence Analysis
+### Convergence Analysis
 
 The model achieved convergence within 5 epochs:
 
@@ -248,25 +247,25 @@ history = model.fit(
 )
 ```
 
-![Figure 5: Training Convergence](report_figures/fig5_training_history.png)
+![Figure 3: Training Convergence](Stock%20Price%20Prediction%20using%20Deep%20Learning/fig5_training_history.png)
 
-#### Challenges Encountered
+Figure 3: Training Convergence
 
-1. **Learning rate sensitivity**: 
-   - Initial learning rate of 0.001 caused slow convergence
-   - Increased to 0.01 for faster training
-   - Values >0.01 caused gradient explosion
+### Challenges Encountered
 
-2. **GPU unavailability**: 
-   - Training executed on CPU (~10 minutes for 5 epochs)
-   - Limited batch size to 512 to manage memory
-
+1. **Learning rate sensitivity**:
+    - Initial learning rate of 0.001 caused slow convergence
+    - Increased to 0.01 for faster training
+    - Values >0.01 caused gradient explosion
+2. **GPU unavailability**:
+    - Training executed on CPU (~10 minutes for 5 epochs)
+    - Limited batch size to 512 to manage memory
 3. **Model architecture choices**:
-   - 3-layer Conv1D chosen over 1-layer for better feature extraction
-   - MaxPooling after each Conv1D layer for dimensionality reduction
-   - Dropout not needed due to sufficient regularization from pooling
+    - 3-layer Conv1D chosen over 1-layer for better feature extraction
+    - MaxPooling after each Conv1D layer for dimensionality reduction
+    - Dropout not needed due to sufficient regularization from pooling
 
-#### Conclusions
+### Conclusions
 
 - The 3-layer Conv1D architecture effectively captures local temporal patterns in stock data
 - Per-window normalization is critical for preventing data leakage
@@ -276,7 +275,7 @@ history = model.fit(
 
 ### 5.3 Task 3: K-Day Ahead Forecasting
 
-#### Implementation
+### Implementation
 
 The k-day ahead forecasting was implemented using separate models for each forecast horizon:
 
@@ -293,67 +292,66 @@ def prepare_data_k(df, feature_columns, window_size, k):
     return np.array(X_data), np.array(y_data)
 ```
 
-#### Results - Nasdaq (AAPL)
+### Results - Nasdaq (AAPL)
 
-| k (days) | MSE (Normalized) | Observation |
-|----------|------------------|--------------|
+| **k (days)** | **MSE (Normalized)** | **Observation** |
+| --- | --- | --- |
 | 1 | 0.0208 | Baseline - best accuracy |
 | 3 | 0.0711 | Moderate error increase |
 | 5 | 0.1121 | Continued error growth |
 | 7 | 0.1759 | Significant degradation |
 
-#### Results - Vietnam (ACB)
+### Results - Vietnam (ACB)
 
-| k (days) | MSE (Normalized) | Observation |
-|----------|------------------|--------------|
+| **k (days)** | **MSE (Normalized)** | **Observation** |
+| --- | --- | --- |
 | 1 | 0.0156 | Best accuracy - better than AAPL |
 | 3 | 0.0631 | Similar degradation pattern |
 | 5 | 0.1187 | Higher than AAPL at same horizon |
 | 7 | 0.2409 | Highest error - expected for volatile market |
 
-#### Trend Analysis
+### Trend Analysis
 
-![Figure 2: MSE vs Forecast Horizon](report_figures/fig2_mse_vs_horizon.png)
+![Figure 4: MSE vs Forecast Horizon](Stock%20Price%20Prediction%20using%20Deep%20Learning/fig2_mse_vs_horizon.png)
+
+Figure 4: MSE vs Forecast Horizon
 
 The relationship between forecast horizon (k) and MSE is not strictly linear. Key observations:
 
-1. **Error accumulation**: As k increases, prediction errors compound because each day's prediction depends on previous predictions.
-
+1. **Error accumulation**: As k increases, prediction errors compound because each day’s prediction depends on previous predictions.
 2. **Non-monotonic degradation**: k=5 showing improvement over k=3 suggests:
-   - Random variation in market patterns
-   - Some horizons may capture better cyclical patterns
-   - Model capacity limits different horizons differently
-
+    - Random variation in market patterns
+    - Some horizons may capture better cyclical patterns
+    - Model capacity limits different horizons differently
 3. **k=7 anomaly**: The significant MSE increase at k=7 indicates:
-   - Weekly cycles may have different characteristics
-   - Information loss becomes critical beyond 5-day windows
-   - Need for different architecture for longer horizons
+    - Weekly cycles may have different characteristics
+    - Information loss becomes critical beyond 5-day windows
+    - Need for different architecture for longer horizons
 
-#### Vietnam vs Nasdaq Comparison
+### Vietnam vs Nasdaq Comparison
 
-![Figure 4: MSE Comparison - Nasdaq vs Vietnam](report_figures/fig4_mse_comparison.png)
+![Figure 5: MSE Comparison - Nasdaq vs Vietnam](Stock%20Price%20Prediction%20using%20Deep%20Learning/fig4_mse_comparison.png)
+
+Figure 5: MSE Comparison - Nasdaq vs Vietnam
 
 Key differences between markets:
 
 1. **Higher Vietnam MSE**: Vietnam market showed generally higher MSE, attributable to:
-   - Less mature market with higher volatility
-   - Smaller dataset (500 vs 1000 records)
-   - Fewer features (5 vs 6)
-
+    - Less mature market with higher volatility
+    - Smaller dataset (500 vs 1000 records)
+    - Fewer features (5 vs 6)
 2. **Similar pattern**: Both markets showed increasing error with forecast horizon, confirming the universal challenge of long-term prediction.
 
-#### Challenges
+### Challenges
 
 1. **Error propagation**: Multi-step predictions accumulate errors exponentially
-   - Solution: Use encoder-decoder architecture for long horizons
-   
-2. **Feature mismatch**: Vietnam data missing 'Adjusted Close' required model adjustment
-   - Solution: Use 5-feature model instead of 6-feature
-
+    - Solution: Use encoder-decoder architecture for long horizons
+2. **Feature mismatch**: Vietnam data missing ‘Adjusted Close’ required model adjustment
+    - Solution: Use 5-feature model instead of 6-feature
 3. **Computational cost**: Training 4 separate models (k=1,3,5,7) increased training time 4x
-   - Solution: Consider multi-output model in future work
+    - Solution: Consider multi-output model in future work
 
-#### Conclusions
+### Conclusions
 
 - Short-term predictions (k=1, k=3) are reasonably accurate for practical use
 - Forecast accuracy degrades significantly beyond 5 days
@@ -364,35 +362,37 @@ Key differences between markets:
 
 ### 5.4 Task 4: Model Comparison
 
-#### Models Evaluated
+### Models Evaluated
 
-| Model | Architecture | MSE | Train Time |
-|-------|---------------|-----|------------|
+| **Model** | **Architecture** | **MSE** | **Train Time** |
+| --- | --- | --- | --- |
 | Conv1D (3-layer) | Conv1D(64)→Conv1D(128)→Conv1D(64)→Dense | 0.038 | ~5 min |
 | Conv1D (1-layer) | Conv1D(64)→Dense | 0.045 | ~2 min |
 | LSTM | LSTM(64)→LSTM(64)→Dense | 0.042 | ~8 min |
 | Dense (MLP) | Dense(256)→Dense(128)→Dense | 0.055 | ~3 min |
 
-#### Deep Dive: Why Conv1D Performed Best
+### Deep Dive: Why Conv1D Performed Best
 
-1. **Local pattern extraction**: Conv1D's kernel size of 3 captures local temporal patterns effectively:
-   ```python
-   Conv1D(64, kernel_size=3, activation='relu', padding='same')
-   ```
-   This sliding window approach aligns well with stock price movements where adjacent days are correlated.
-
+1. **Local pattern extraction**: Conv1D’s kernel size of 3 captures local temporal patterns effectively:
+    
+    ```python
+    Conv1D(64, kernel_size=3, activation='relu', padding='same')
+    ```
+    
+    This sliding window approach aligns well with stock price movements where adjacent days are correlated.
+    
 2. **Parameter efficiency**: Compared to LSTM, Conv1D uses fewer parameters:
-   - Conv1D(64): ~1,500 parameters per layer
-   - LSTM(64): ~33,000 parameters per layer
-   
-   Fewer parameters reduce overfitting risk on limited financial data.
-
+    - Conv1D(64): ~1,500 parameters per layer
+    - LSTM(64): ~33,000 parameters per layer
+    
+    Fewer parameters reduce overfitting risk on limited financial data.
+    
 3. **Parallel processing**: Conv1D operations are more parallelizable than sequential LSTM computations, enabling faster training on CPU.
 
-#### Why Other Models Performed Worse
+### Why Other Models Performed Worse
 
 **LSTM (MSE: 0.042)**
-- Overkill for short-term patterns: LSTM's ability to capture long-term dependencies wasn't fully utilized
+- Overkill for short-term patterns: LSTM’s ability to capture long-term dependencies wasn’t fully utilized
 - Higher computational cost: 60% longer training time for marginal improvement
 - Gradient vanishing: Some sequences showed gradient degradation
 
@@ -402,24 +402,15 @@ Key differences between markets:
 - Require explicit feature engineering: Moving averages, RSI need to be pre-computed
 
 **Single-layer Conv1D (MSE: 0.045)**
-- Insufficient capacity: One Conv1D layer can't capture multi-scale patterns
+- Insufficient capacity: One Conv1D layer can’t capture multi-scale patterns
 - Shallow feature extraction: Limited to very local patterns (<3 days)
 
-#### Trade-offs Analysis
-
-| Aspect | Conv1D | LSTM | MLP |
-|--------|--------|------|-----|
-| Accuracy | ★★★★★ | ★★★★☆ | ★★★☆☆ |
-| Training Speed | ★★★★☆ | ★★★☆☆ | ★★★★★ |
-| Memory Usage | ★★★★★ | ★★☆☆☆ | ★★★★☆ |
-| Implementation | ★★★★☆ | ★★★☆☆ | ★★★★★ |
-
-#### Vietnam Market Model Comparison
+### Vietnam Market Model Comparison
 
 Vietnam data showed slightly different ranking:
 
-| Model | MSE (Vietnam) |
-|-------|--------------|
+| **Model** | **MSE (Vietnam)** |
+| --- | --- |
 | Conv1D (3-layer) | 0.175 |
 | LSTM | 0.180 |
 | Conv1D (1-layer) | 0.195 |
@@ -430,21 +421,19 @@ The gap between Conv1D and LSTM is smaller in Vietnam data, possibly due to:
 - Less pronounced long-term patterns
 - Smaller training dataset
 
-#### Challenges in Model Selection
+### Challenges in Model Selection
 
 1. **Hyperparameter tuning**: Optimal parameters varied by dataset
-   - AAPL: kernel_size=3 worked best
-   - Vietnam: required lower learning rate (0.005 vs 0.01)
-
+    - AAPL: kernel_size=3 worked best
+    - Vietnam: required lower learning rate (0.005 vs 0.01)
 2. **Architecture search**: Limited compute prevented extensive search
-   - Only tested 4 architectures
-   - Could benefit from AutoML exploration
+    - Only tested 4 architectures
+    - Could benefit from AutoML exploration
+3. **Dataset dependency**: No single “best” model across all datasets
+    - Conv1D best for Nasdaq
+    - LSTM more robust for Vietnam (future exploration)
 
-3. **Dataset dependency**: No single "best" model across all datasets
-   - Conv1D best for Nasdaq
-   - LSTM more robust for Vietnam (future exploration)
-
-#### Conclusions
+### Conclusions
 
 - Conv1D is the optimal choice for stock prediction with available compute
 - LSTM offers comparable performance but at higher computational cost
@@ -455,7 +444,7 @@ The gap between Conv1D and LSTM is smaller in Vietnam data, possibly due to:
 
 ### 5.5 Task 5: Deployment
 
-#### API Performance Observations
+### API Performance Observations
 
 The FastAPI deployment showed the following characteristics:
 
@@ -463,13 +452,13 @@ The FastAPI deployment showed the following characteristics:
 2. **Batch processing**: Can handle up to 100 simultaneous requests
 3. **Memory footprint**: ~200MB (model + TensorFlow runtime)
 
-#### Streamlit Dashboard Observations
+### Streamlit Dashboard Observations
 
 - User-friendly interface enabled non-technical users to make predictions
 - Real-time visualization updated within 1 second of API response
 - Data loading cache reduced repeated API calls
 
-#### Challenges in Deployment
+### Challenges in Deployment
 
 1. **Model serialization**: Keras model required .keras format (not .h5) for compatibility
 2. **Input normalization**: Client-side normalization must match training normalization
@@ -520,64 +509,21 @@ Designed an automated pipeline with:
 
 ## 7. Technical Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Stock Prediction System                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   Airbyte    │───▶│  PostgreSQL  │───▶│     dbt      │      │
-│  │ (Ingestion)  │    │ (Raw Data)   │    │(Transform)   │      │
-│  └──────────────┘    └──────────────┘    └──────┬───────┘      │
-│                                                  │               │
-│                                                  ▼               │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │  Streamlit   │◀───│   FastAPI    │◀───│  Airflow     │      │
-│  │  (Frontend)  │    │ (Prediction) │    │(Orchestration│      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                              ▲                                   │
-│                              │                                   │
-│                     ┌────────┴────────┐                         │
-│                     │ stock_model.keras │                        │
-│                     │   (Conv1D)       │                         │
-│                     └──────────────────┘                         │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+![1778495844973705256.png](Stock%20Price%20Prediction%20using%20Deep%20Learning/1778495844973705256.png)
 
 ---
 
-## 8. Code Structure
-
-```
-final-project/
-├── data/
-│   ├── AAPL.csv                    # US stock data
-│   ├── ACB-VNINDEX-History.csv     # Vietnam data
-│   └── companies.csv               # Company metadata
-├── stock_model.keras               # Trained model
-├── train_model.py                  # Model training script
-├── api.py                          # FastAPI server
-├── app.py                          # Streamlit dashboard
-├── stock_prediction_dag.py        # Airflow DAG
-├── workflow.md                    # MLOps documentation
-├── REPORT.md                      # This report
-└── README.md                      # Quick start guide
-```
-
----
-
-## 9. Conclusion
+## 8. Conclusion
 
 This project successfully demonstrates an end-to-end deep learning pipeline for stock price prediction. The Conv1D model achieves reasonable prediction accuracy (MSE ~0.04) on test data. The deployment architecture using FastAPI and Streamlit provides a practical foundation for production use.
 
-### 9.1 Key Learnings
+### 8.1 Key Learnings
 
 1. **Data preprocessing is critical:** Proper normalization significantly impacts model performance
 2. **Model architecture matters:** Conv1D captures local patterns effectively in time-series
 3. **Deployment requires MLOps:** Production systems need automated pipelines for retraining
 
-### 9.2 Future Improvements
+### 8.2 Future Improvements
 
 - Implement attention mechanisms for better long-range dependencies
 - Add more technical indicators (MACD, Bollinger Bands)
@@ -587,14 +533,10 @@ This project successfully demonstrates an end-to-end deep learning pipeline for 
 
 ---
 
-## 10. References
+## 9. References
 
 1. TensorFlow Documentation: https://www.tensorflow.org/api_docs
 2. FastAPI Documentation: https://fastapi.tiangolo.com/
 3. Streamlit Documentation: https://docs.streamlit.io/
 4. Apache Airflow: https://airflow.apache.org/
 5. Keras Conv1D: https://keras.io/api/layers/convolution_layers/conv1d/
-
----
-
-**End of Report**
